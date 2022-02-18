@@ -21,7 +21,7 @@
           "error",
           {
             "type": "element",
-            "prefix": "ng-media-utils",
+            "prefix": "app",
             "style": "kebab-case"
           }
         ]
