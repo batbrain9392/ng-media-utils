@@ -14,7 +14,16 @@
         "polyfills": "apps/sandbox/src/polyfills.ts",
         "tsConfig": "apps/sandbox/tsconfig.app.json",
         "inlineStyleLanguage": "scss",
-        "assets": ["apps/sandbox/src/favicon.ico", "apps/sandbox/src/assets"],
+        "assets": [
+          "apps/sandbox/src/favicon.ico",
+          "apps/sandbox/src/assets",
+          {
+            "glob": "**/*",
+            "input": "./node_modules/@mediapipe/selfie_segmentation",
+            "ignore": ["*.ts", "*.json", "*.md"],
+            "output": "/assets/background-blur/"
+          }
+        ],
         "styles": ["apps/sandbox/src/styles.scss"],
         "scripts": []
       },
