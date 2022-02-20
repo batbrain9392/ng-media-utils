@@ -1,1 +1,10 @@
-<video [srcObject]="stream" autoplay></video>
+<p>
+  <button (click)="startCam()">start cam</button>
+  <button (click)="stopCam()">stop cam</button>
+</p>
+<video
+  [srcObject]="processedStream"
+  autoplay
+  [muted]="true"
+  class="mirror"
+></video>

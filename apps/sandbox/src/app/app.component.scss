@@ -2,3 +2,11 @@
   display: block;
   height: 100%;
 }
+
+p {
+  margin-top: 0;
+}
+
+.mirror {
+  transform: rotateY(0.5turn);
+}
