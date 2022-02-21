@@ -7,7 +7,13 @@ import {
 } from '@angular/core';
 import { Results, SelfieSegmentation } from '@mediapipe/selfie_segmentation';
 import { MEDIA_DEVICES } from '@ng-web-apis/common';
-import { BehaviorSubject, map } from 'rxjs';
+import { BehaviorSubject } from 'rxjs';
+
+enum CameraState {
+  Off,
+  Loading,
+  On,
+}
 
 @Component({
   selector: 'app-root',
@@ -18,21 +24,29 @@ import { BehaviorSubject, map } from 'rxjs';
 export class AppComponent implements OnInit, OnDestroy {
   private readonly canvasElement2 = new OffscreenCanvas(0, 0);
   private readonly canvasCtx2 = this.canvasElement2.getContext('2d');
+
   private readonly selfieSegmentation = new SelfieSegmentation({
     locateFile: (file) => {
       return `/assets/background-blur/${file}`;
     },
   });
-  private readonly processedStream = new BehaviorSubject<MediaStream | null>(
-    null
-  );
+
   private globalController:
     | TransformStreamDefaultController<VideoFrame>
     | undefined;
+
   private timestamp: number | undefined;
 
+  private readonly processedStream = new BehaviorSubject<MediaStream | null>(
+    null
+  );
   readonly processedStream$ = this.processedStream.asObservable();
-  readonly isCameraOff$ = this.processedStream$.pipe(map((v) => !v));
+
+  private readonly cameraState = new BehaviorSubject(CameraState.Off);
+  readonly cameraState$ = this.cameraState.asObservable().pipe();
+
+  readonly CameraState = CameraState;
+
   originalStream: MediaStream | undefined;
 
   constructor(
@@ -51,6 +65,8 @@ export class AppComponent implements OnInit, OnDestroy {
   async ngOnDestroy(): Promise<void> {
     this.stopCam();
     await this.selfieSegmentation.close();
+    this.processedStream.complete();
+    this.cameraState.complete();
   }
 
   onResults(results: Results) {
@@ -104,6 +120,7 @@ export class AppComponent implements OnInit, OnDestroy {
   }
 
   async startCam() {
+    this.cameraState.next(CameraState.Loading);
     this.originalStream = await this.mediaDevices.getUserMedia({
       video: {
         aspectRatio: {
@@ -144,6 +161,7 @@ export class AppComponent implements OnInit, OnDestroy {
       .pipeThrough(transformer)
       .pipeTo(trackGenerator.writable);
     this.processedStream.next(new MediaStream([trackGenerator, audioTrack]));
+    this.cameraState.next(CameraState.On);
   }
 
   stopCam() {
@@ -151,7 +169,8 @@ export class AppComponent implements OnInit, OnDestroy {
     this.processedStream
       ?.getValue()
       ?.getTracks()
-      .forEach((track) => track.stop());
+      .forEach((track) => track.readyState === 'live' && track.stop());
     this.processedStream.next(null);
+    this.cameraState.next(CameraState.Off);
   }
 }

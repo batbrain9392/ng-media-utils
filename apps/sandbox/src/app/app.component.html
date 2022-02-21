@@ -1,13 +1,9 @@
-<p>
-  <button
-    (click)="startCam()"
-    *ngIf="isCameraOff$ | async; else showStopCameraBtn"
-  >
+<p [ngSwitch]="cameraState$ | async">
+  <button (click)="startCam()" *ngSwitchCase="CameraState.Off">
     start cam
   </button>
-  <ng-template #showStopCameraBtn>
-    <button (click)="stopCam()">stop cam</button>
-  </ng-template>
+  <button (click)="stopCam()" *ngSwitchCase="CameraState.On">stop cam</button>
+  <ng-container *ngSwitchDefault>Loading...</ng-container>
 </p>
 <video
   [srcObject]="processedStream$ | async"
