@@ -94,6 +94,9 @@
         "jestConfig": "apps/sandbox/jest.config.js",
         "passWithNoTests": true
       }
+    },
+    "deploy": {
+      "executor": "angular-cli-ghpages:deploy"
     }
   },
   "tags": []
