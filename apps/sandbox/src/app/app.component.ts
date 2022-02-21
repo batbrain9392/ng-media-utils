@@ -1,11 +1,19 @@
-import { Component, Inject, OnDestroy, OnInit } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  Inject,
+  OnDestroy,
+  OnInit,
+} from '@angular/core';
 import { Results, SelfieSegmentation } from '@mediapipe/selfie_segmentation';
 import { MEDIA_DEVICES } from '@ng-web-apis/common';
+import { BehaviorSubject, map } from 'rxjs';
 
 @Component({
   selector: 'app-root',
   templateUrl: './app.component.html',
   styleUrls: ['./app.component.scss'],
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class AppComponent implements OnInit, OnDestroy {
   private readonly canvasElement2 = new OffscreenCanvas(0, 0);
@@ -15,13 +23,17 @@ export class AppComponent implements OnInit, OnDestroy {
       return `/assets/background-blur/${file}`;
     },
   });
+  private readonly processedStream = new BehaviorSubject<MediaStream | null>(
+    null
+  );
   private globalController:
     | TransformStreamDefaultController<VideoFrame>
     | undefined;
   private timestamp: number | undefined;
 
+  readonly processedStream$ = this.processedStream.asObservable();
+  readonly isCameraOff$ = this.processedStream$.pipe(map((v) => !v));
   originalStream: MediaStream | undefined;
-  processedStream: MediaStream | undefined;
 
   constructor(
     @Inject(MEDIA_DEVICES) private readonly mediaDevices: MediaDevices
@@ -131,11 +143,15 @@ export class AppComponent implements OnInit, OnDestroy {
     trackProcessor.readable
       .pipeThrough(transformer)
       .pipeTo(trackGenerator.writable);
-    this.processedStream = new MediaStream([trackGenerator, audioTrack]);
+    this.processedStream.next(new MediaStream([trackGenerator, audioTrack]));
   }
 
   stopCam() {
     this.originalStream?.getTracks().forEach((track) => track.stop());
-    this.processedStream?.getTracks().forEach((track) => track.stop());
+    this.processedStream
+      ?.getValue()
+      ?.getTracks()
+      .forEach((track) => track.stop());
+    this.processedStream.next(null);
   }
 }

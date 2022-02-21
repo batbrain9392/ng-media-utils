@@ -1,9 +1,16 @@
 <p>
-  <button (click)="startCam()">start cam</button>
-  <button (click)="stopCam()">stop cam</button>
+  <button
+    (click)="startCam()"
+    *ngIf="isCameraOff$ | async; else showStopCameraBtn"
+  >
+    start cam
+  </button>
+  <ng-template #showStopCameraBtn>
+    <button (click)="stopCam()">stop cam</button>
+  </ng-template>
 </p>
 <video
-  [srcObject]="processedStream"
+  [srcObject]="processedStream$ | async"
   autoplay
   [muted]="true"
   class="mirror"
