@@ -1,0 +1,42 @@
+{
+  "projectType": "library",
+  "root": "libs/media-utils",
+  "sourceRoot": "libs/media-utils/src",
+  "prefix": "nmu",
+  "targets": {
+    "build": {
+      "executor": "@nrwl/angular:package",
+      "outputs": ["dist/libs/media-utils"],
+      "options": {
+        "project": "libs/media-utils/ng-package.json"
+      },
+      "configurations": {
+        "production": {
+          "tsConfig": "libs/media-utils/tsconfig.lib.prod.json"
+        },
+        "development": {
+          "tsConfig": "libs/media-utils/tsconfig.lib.json"
+        }
+      },
+      "defaultConfiguration": "production"
+    },
+    "test": {
+      "executor": "@nrwl/jest:jest",
+      "outputs": ["coverage/libs/media-utils"],
+      "options": {
+        "jestConfig": "libs/media-utils/jest.config.js",
+        "passWithNoTests": true
+      }
+    },
+    "lint": {
+      "executor": "@nrwl/linter:eslint",
+      "options": {
+        "lintFilePatterns": [
+          "libs/media-utils/src/**/*.ts",
+          "libs/media-utils/src/**/*.html"
+        ]
+      }
+    }
+  },
+  "tags": []
+}
