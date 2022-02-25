@@ -8,12 +8,16 @@ import {
 import { BackgroundEffectsService } from '@batbrain9392/ng-media-utils';
 import { MEDIA_DEVICES } from '@ng-web-apis/common';
 import { BehaviorSubject } from 'rxjs';
+import { environment } from '../environments/environment';
 
 enum CameraState {
   Off,
   Loading,
   On,
 }
+const assetsPath = `${
+  environment.production ? `/ng-media-utils` : ``
+}/assets/background-effects`;
 
 @Component({
   selector: 'app-root',
@@ -40,7 +44,7 @@ export class AppComponent implements OnInit, OnDestroy {
   ) {}
 
   async ngOnInit(): Promise<void> {
-    await this.backgroundEffects.init();
+    await this.backgroundEffects.init(assetsPath);
   }
 
   async ngOnDestroy(): Promise<void> {
