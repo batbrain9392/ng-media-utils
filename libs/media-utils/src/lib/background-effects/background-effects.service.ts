@@ -1,5 +1,6 @@
 import { Injectable } from '@angular/core';
 import { Results, SelfieSegmentation } from '@mediapipe/selfie_segmentation';
+import { BehaviorSubject } from 'rxjs';
 
 @Injectable({
   providedIn: 'root',
@@ -7,12 +8,18 @@ import { Results, SelfieSegmentation } from '@mediapipe/selfie_segmentation';
 export class BackgroundEffectsService {
   private readonly canvasElement2 = new OffscreenCanvas(0, 0);
   private readonly canvasCtx2 = this.canvasElement2.getContext('2d');
+  private readonly blurIntensitySub = new BehaviorSubject(10);
 
   private selfieSegmentation: SelfieSegmentation | undefined;
   private timestamp: number | undefined;
   private globalController:
     | TransformStreamDefaultController<VideoFrame>
     | undefined;
+
+  /**
+   * Default value is `10px`
+   */
+  readonly blurIntensity$ = this.blurIntensitySub.asObservable();
 
   /**
    * Lazy loads the selfie segmentation library.
@@ -98,6 +105,18 @@ export class BackgroundEffectsService {
     return trackGenerator;
   }
 
+  /**
+   * This is based on the css filter `blur`.
+   * The minimum accepted value is 0.
+   * You're free to set your own maximum blur limit.
+   * @param  {number} value min=`0`
+   * @returns void
+   */
+  setBlurIntensity(value: number): void {
+    if (value < 0) throw new Error('Blur intensity cannot be less than 0');
+    this.blurIntensitySub.next(value);
+  }
+
   private onResults(results: Results): void {
     if (!this.canvasCtx2) {
       return;
@@ -131,8 +150,9 @@ export class BackgroundEffectsService {
 
     // background
     this.canvasCtx2.globalCompositeOperation = 'destination-atop';
-    this.canvasCtx2.fillStyle = '#00FF00';
-    this.canvasCtx2.fillRect(
+    this.canvasCtx2.filter = `blur(${this.blurIntensitySub.getValue()}px)`;
+    this.canvasCtx2.drawImage(
+      results.image,
       0,
       0,
       this.canvasElement2.width,
