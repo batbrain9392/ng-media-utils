@@ -1,6 +1,7 @@
 {
   "version": 2,
   "projects": {
+    "media-utils": "libs/media-utils",
     "sandbox": "apps/sandbox",
     "sandbox-e2e": "apps/sandbox-e2e"
   }
