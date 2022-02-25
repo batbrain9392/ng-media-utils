@@ -7,6 +7,8 @@ MIT
 @angular/platform-browser
 MIT
 
+@batbrain9392/ng-media-utils
+
 @mediapipe/selfie_segmentation
 Apache-2.0
 
