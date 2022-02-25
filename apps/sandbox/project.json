@@ -94,6 +94,13 @@
         "jestConfig": "apps/sandbox/jest.config.js",
         "passWithNoTests": true
       }
+    },
+    "deploy": {
+      "executor": "angular-cli-ghpages:deploy",
+      "options": {
+        "baseHref": "/ng-media-utils/",
+        "cname": "github.com"
+      }
     }
   },
   "tags": []
