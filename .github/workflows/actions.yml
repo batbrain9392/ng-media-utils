@@ -28,7 +28,7 @@ jobs:
       - run: npx nx affected --target=test --parallel --max-parallel=2
       - run: npx nx-cloud stop-all-agents
       - name: Deploy to Github Pages
-        run: npx nx run sandbox:deploy
+        run: npx nx deploy
   pr:
     runs-on: ubuntu-latest
     if: ${{ github.event_name == 'pull_request' }}
