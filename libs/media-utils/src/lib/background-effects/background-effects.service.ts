@@ -17,12 +17,14 @@ export class BackgroundEffectsService {
   /**
    * Lazy loads the selfie segmentation library.
    * Call this once during initialization.
+   * @param  {string} assetsPath eg: `/assets/background-blur`
+   * @returns Promise
    */
-  init(): Promise<void> {
+  init(assetsPath: string): Promise<void> {
     if (!this.selfieSegmentation) {
       this.selfieSegmentation = new SelfieSegmentation({
         locateFile: (file) => {
-          return `/assets/background-blur/${file}`;
+          return `${assetsPath}/${file}`;
         },
       });
       this.selfieSegmentation.setOptions({
@@ -38,6 +40,7 @@ export class BackgroundEffectsService {
   /**
    * Closes the selfie segmentation library.
    * Call this when you are done with the service.
+   * @returns Promise
    */
   async destroy(): Promise<void> {
     if (this.selfieSegmentation) {
@@ -56,8 +59,8 @@ export class BackgroundEffectsService {
    * It stops when the original raw video track is stopped.
    *
    * `Note` Before sending in a new track, you must stop the existing raw video track.
-   * @param videoTrack The raw video track from the camera
-   * @returns The processed video-track generator
+   * @param {MediaStreamVideoTrack} videoTrack The raw video track from the camera
+   * @returns Promise of the processed video-track generator
    * @example
    * ```ts
    * const originalStream = await this.mediaDevices.getUserMedia({ video: true });
