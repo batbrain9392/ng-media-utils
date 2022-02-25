@@ -36,6 +36,8 @@ export class AppComponent implements OnInit, OnDestroy {
 
   readonly CameraState = CameraState;
 
+  readonly blurIntensity$ = this.backgroundEffects.blurIntensity$;
+
   originalStream: MediaStream | undefined;
 
   constructor(
@@ -54,7 +56,7 @@ export class AppComponent implements OnInit, OnDestroy {
     this.cameraState.complete();
   }
 
-  async startCam() {
+  async startCam(): Promise<void> {
     this.cameraState.next(CameraState.Loading);
     this.originalStream = await this.mediaDevices.getUserMedia({
       video: {
@@ -78,7 +80,7 @@ export class AppComponent implements OnInit, OnDestroy {
     this.cameraState.next(CameraState.On);
   }
 
-  stopCam() {
+  stopCam(): void {
     this.originalStream?.getTracks().forEach((track) => track.stop());
     this.processedStream
       ?.getValue()
@@ -86,5 +88,11 @@ export class AppComponent implements OnInit, OnDestroy {
       .forEach((track) => track.readyState === 'live' && track.stop());
     this.processedStream.next(null);
     this.cameraState.next(CameraState.Off);
+  }
+
+  setBlurIntensity({ target }: Event): void {
+    if (target instanceof HTMLInputElement) {
+      this.backgroundEffects.setBlurIntensity(target.valueAsNumber);
+    }
   }
 }

@@ -2,7 +2,16 @@
   <button (click)="startCam()" *ngSwitchCase="CameraState.Off">
     start cam
   </button>
-  <button (click)="stopCam()" *ngSwitchCase="CameraState.On">stop cam</button>
+  <ng-container *ngSwitchCase="CameraState.On">
+    <button [style.margin-right.rem]="1" (click)="stopCam()">stop cam</button>
+    0<input
+      type="range"
+      min="0"
+      max="30"
+      [value]="blurIntensity$ | async"
+      (input)="setBlurIntensity($event)"
+    />30
+  </ng-container>
   <ng-container *ngSwitchDefault>Loading...</ng-container>
 </p>
 <video
